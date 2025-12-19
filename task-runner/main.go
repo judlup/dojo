@@ -12,43 +12,47 @@ type Task struct {
 	Done  bool
 }
 
-func logic(cmd string, value string, tasks []Task) []Task {
+func logic(cmd string, value string, tasks []Task) ([]Task, error) {
 	id := len(tasks) + 1
 	switch cmd {
 	case "add":
-		id++
 		task := Task{
 			Id:    id,
 			Title: value,
 			Done:  false,
 		}
 		if value == "" {
-			log("Task title cannot be empty")
+			// log("Task title cannot be empty")
+			return nil, fmt.Errorf("task title cannot be empty")
 		}
 		tasks = append(tasks, task)
-		log(fmt.Sprintf("Created Task: %+v", task))
+		return tasks, nil
+		// log(fmt.Sprintf("Created Task: %+v", task))
 	case "list":
-		log("Todo List Tasks")
-		for _, task := range tasks {
-			log(fmt.Sprintf("Task ID: %d, Title: %s, Done: %v", task.Id, task.Title, task.Done))
-		}
+		// log("Todo List Tasks")
+		// for _, task := range tasks {
+		// 	log(fmt.Sprintf("Task ID: %d, Title: %s, Done: %v", task.Id, task.Title, task.Done))
+		// }
+		return tasks, nil
 	case "delete":
 		taskId, err := strconv.Atoi(value)
 		if err != nil {
-			log("Invalid Task ID")
+			// log("Invalid Task ID")
+			return tasks, fmt.Errorf("invalid task ID")
 		}
 		for i, task := range tasks {
 			if task.Id == taskId {
 				tasks = append(tasks[:i], tasks[i+1:]...)
-				log(fmt.Sprintf("Deleted Task ID: %d", taskId))
+				// log(fmt.Sprintf("Deleted Task ID: %d", taskId))
 				break
 			}
 		}
-		log(fmt.Sprintf("Remaining Tasks: %+v", tasks))
+		return tasks, nil
+		// log(fmt.Sprintf("Remaining Tasks: %+v", tasks))
 	default:
-		log(fmt.Sprintf("Unknown command: %s", cmd))
+		// log(fmt.Sprintf("Unknown command: %s", cmd))
 	}
-	return tasks
+	return tasks, nil
 }
 
 func log(message string) {
@@ -72,5 +76,11 @@ func main() {
 	} else {
 		value = ""
 	}
-	tasks = logic(cmd, value, tasks)
+	tasks, err := logic(cmd, value, tasks)
+	if err != nil {
+		log(err.Error())
+	} else {
+		log("Operation completed successfully")
+		fmt.Sprintf("%+v", tasks)
+	}
 }
