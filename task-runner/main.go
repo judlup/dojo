@@ -22,12 +22,10 @@ func logic(cmd string, value string, tasks []Task) ([]Task, error) {
 			Done:  false,
 		}
 		if value == "" {
-			// log("Task title cannot be empty")
 			return nil, fmt.Errorf("task title cannot be empty")
 		}
 		tasks = append(tasks, task)
-		return tasks, nil
-		// log(fmt.Sprintf("Created Task: %+v", task))
+		return tasks, nil		
 	case "list":
 		// log("Todo List Tasks")
 		// for _, task := range tasks {
@@ -36,21 +34,23 @@ func logic(cmd string, value string, tasks []Task) ([]Task, error) {
 		return tasks, nil
 	case "delete":
 		taskId, err := strconv.Atoi(value)
-		if err != nil {
-			// log("Invalid Task ID")
+		found := false
+		if err != nil {			
 			return tasks, fmt.Errorf("invalid task ID")
 		}
 		for i, task := range tasks {
 			if task.Id == taskId {
-				tasks = append(tasks[:i], tasks[i+1:]...)
-				// log(fmt.Sprintf("Deleted Task ID: %d", taskId))
+				tasks = append(tasks[:i], tasks[i+1:]...)				
+				found = true
 				break
 			}
 		}
-		return tasks, nil
-		// log(fmt.Sprintf("Remaining Tasks: %+v", tasks))
+		if !found {
+			return tasks, fmt.Errorf("task ID %d not found", taskId)
+		}
+		return tasks, nil		
 	default:
-		// log(fmt.Sprintf("Unknown command: %s", cmd))
+		return tasks, fmt.Errorf("unknown command: %s", cmd)
 	}
 	return tasks, nil
 }
@@ -81,6 +81,6 @@ func main() {
 		log(err.Error())
 	} else {
 		log("Operation completed successfully")
-		fmt.Sprintf("%+v", tasks)
+		fmt.Printf("%+v\n", tasks)
 	}
 }
